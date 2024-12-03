@@ -1,15 +1,13 @@
-`timescale 1ns/1ns
-
 module aaIDTB();
 
-    reg clock, reset;
+    reg clock, reset
     reg [15:0] ID_instruction;
     wire [3:0] opcode;
     wire [5:0] param1;
     wire [5:0] param2;
 
 
-    always #5 clock = ~clock;
+    always #5 clk = ~clk;
 
 
     ID test(
@@ -39,5 +37,7 @@ module aaIDTB();
         ID_instruction = 16'b0010001100110011;
         #10;
 
+        // Finish simulation
+        $finish;
     end
 endmodule;
