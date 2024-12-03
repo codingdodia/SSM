@@ -29,10 +29,8 @@ tri_state_buffer IO_Zero_bus_tri_state(
     .data_out(bus_I0_output)
 );
 
-tri_state_buffer IO_Zero_external_tri_state(
-    .data_in(IO_data),
-    .enable(external_IO_Zero_output_en),
-    .data_out(external_IO_Zero_output)
-);
+always@(*) begin
+    external_IO_Zero_output = IO_data;
+end
 
 endmodule
