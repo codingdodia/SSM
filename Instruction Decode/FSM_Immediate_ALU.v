@@ -1,11 +1,11 @@
-module ALU_FSM(
+module ALU_Immediate(
     input clock,
     input reset,
     input FSM_start,
     input [3:0] opcode,
-    input [3:0] start,
     input [5:0] param1,
-    input [5:0] param2,
+    input [15:0] immediate,
+    output [15:0] FSM_bus_output,
     output reg bus_register_input_en,
     output reg bus_register_out_en,
     output reg [5:0] register_addr,
@@ -16,6 +16,7 @@ module ALU_FSM(
     output reg done
 );
 
+reg immediate_en, current_state, next_state;
 
 parameter s0 = 4'b0000;
 parameter s1 = 4'b0001;
@@ -60,6 +61,12 @@ always@(*) begin
     endcase
 end
 
+tri_state_buffer immediate_tri_state(
+    .data_in(immediate),
+    .enable(immediate_en),
+    .data_out(FSM_bus_output)
+);
+
 always@(posedge clock) begin
 
     if (reset) begin
@@ -69,12 +76,14 @@ always@(posedge clock) begin
         latched_bus1_en <= 1'b0;
         latched_bus2_en <= 1'b0;
         alu_bus_out_en <= 1'b0;
+        immediate_en <= 1'b0;
     end 
     
     else begin
         case(current_state)
             s0: begin 
-                done = 1'b0;  
+                done = 1'b0;
+                
             end
 
             s1: begin
@@ -93,8 +102,7 @@ always@(posedge clock) begin
             end
 
             s4: begin
-                register_addr = param2;
-                bus_register_out_en = 1;
+                immediate_en = 1;
             end
 
             s5: begin

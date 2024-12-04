@@ -15,7 +15,7 @@ output MFC;
 reg [15:0] dataout, memorycell;
 reg MFC;
 
-always@(posedge RN)
+always@(posedge EN)
 begin
     if(RW == 1) begin
         case(addr)
