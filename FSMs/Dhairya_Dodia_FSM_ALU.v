@@ -1,7 +1,7 @@
 module ALU_FSM(
     input clock,
     input reset,
-    input [3:0]FSM_start,
+    input [3:0] FSM_start,
     input [3:0] opcode,
     input [5:0] param1,
     input [5:0] param2,
@@ -17,6 +17,7 @@ module ALU_FSM(
     output reg done
 );
 
+reg [3:0] current_state, next_state;
 
 parameter s0 = 4'b0000;
 parameter s1 = 4'b0001;
@@ -41,7 +42,7 @@ end
 always@(*) begin
     case(current_state)
         s0: begin   
-            if(FSM_start == 4'b0) begin
+            if(FSM_start == 4'b0000) begin
                 next_state = s1;
             end else begin
                 next_state = s0;
@@ -61,15 +62,18 @@ always@(*) begin
     endcase
 end
 
-always@(posedge clock) begin
+always@(posedge clock or posedge reset) begin
 
     if (reset) begin
+        latched_bus1_en = 1'b0;
+        latched_bus2_en = 1'b0;
+        bus_register_out_en = 1'b0;
+        bus_register_input_en = 1'b0;
+        I0_bus_input_en = 1'b0;
+        I0_bus_output_en = 1'b0;
+        alu_bus_out_en = 1'b0;
+        alu_control = 4'b1111;
         done <= 1'b0;
-        bus_register_input_en <= 1'b0;
-        bus_register_out_en <= 1'b0;
-        latched_bus1_en <= 1'b0;
-        latched_bus2_en <= 1'b0;
-        alu_bus_out_en <= 1'b0;
     end 
     
     else begin
@@ -79,63 +83,63 @@ always@(posedge clock) begin
             end
 
             s1: begin
-                if (param1 > 4) begin
-                    I0_bus_output_en = 1;
+                if (param1 > 4'b0011) begin
+                    I0_bus_output_en = 1'b0;
                 end else begin
                     // Load param1 into register
                     register_addr = param1;
-                    bus_register_out_en = 1;
+                    bus_register_out_en = 1'b1;
                 end
             end
 
             s2: begin
-                latched_bus1_en = 1;
+                latched_bus1_en = 1'b1;
                 alu_control = opcode;
             end
 
             s3: begin
-                latched_bus1_en = 0;
-                bus_register_out_en = 0;
-                I0_bus_ouput_en = 0;
+                latched_bus1_en = 1'b0;
+                bus_register_out_en = 1'b0;
+                I0_bus_output_en = 1'b0;
             end
 
             s4: begin
-                if (param2 > 4) begin
-                    I0_bus_output_en = 1;
+                if (param2 > 4'b0011) begin
+                    I0_bus_output_en = 1'b0;
                 end else begin
                     // Load param2 into register
                     register_addr = param2;
-                    bus_register_out_en = 1;
+                    bus_register_out_en = 1'b1;
                 end
             end
 
             s5: begin
-                latched_bus2_en = 1;
+                latched_bus2_en = 1'b1;
             end
 
             s6: begin
-                latched_bus2_en = 0;
-                bus_register_out_en = 0;
-                I0_bus_ouput_en = 0;
+                latched_bus2_en = 1'b0;
+                bus_register_out_en = 1'b0;
+                I0_bus_output_en = 1'b0;
             end
 
             s7: begin
-                alu_bus_out_en = 1;
+                alu_bus_out_en = 1'b1;
                 register_addr = param1;
             end
 
             s8: begin
-                bus_register_input_en = 1;
+                bus_register_input_en = 1'b1;
             end
 
             s9: begin 
-                bus_register_input_en = 0;
-                alu_bus_out_en = 0;
-                done = 1;
+                bus_register_input_en = 1'b0;
+                alu_bus_out_en = 1'b0;
+                done = 1'b0;
             end
 
             s10: begin
-                done = 0;
+                done = 1'b0;
             end
 
             default: next_state = s0;
