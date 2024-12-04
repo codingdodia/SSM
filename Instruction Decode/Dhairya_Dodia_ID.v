@@ -1,43 +1,76 @@
-`timescale 1ns/1ns
-
-module aaIDTB();
-
-    reg clock, reset;
-    reg [15:0] ID_instruction;
-    wire [3:0] opcode;
-    wire [5:0] param1;
-    wire [5:0] param2;
-
-
-    always #5 clock = ~clock;
+module ID(
+    input ID_clock,
+    input ID_reset,
+    input [15:0] ID_instruction,
+    output reg [3:0] opcode,
+    output reg [5:0] parameter1,
+    output reg [5:0] parameter2
+);
 
 
-    ID test(
-        .ID_clock(clock),
-        .ID_reset(reset),
-        .ID_instruction(ID_instruction),
-        .opcode(opcode),
-        .parameter1(param1),
-        .parameter2(param2)
-    );
+always@(posedge ID_clock) begin
 
-    initial begin
-        // Initialize signals
-        clock = 0;
-        reset = 1;
-        ID_instruction = 16'b0;
-
-        // Apply reset
-        #10;
-        reset = 0;
-
-        // Apply test vector
-        ID_instruction = 16'b0001000001000001;
-        #10;
-
-        // Apply another test vector
-        ID_instruction = 16'b0010001100110011;
-        #10;
-
+    if(ID_reset) begin
+        opcode <= 4'b0;
+        parameter1 <= 6'b0;
+        parameter2 <= 6'b0;
     end
-endmodule;
+
+    else begin
+        opcode <= ID_instruction[15:12];
+        parameter1 <= ID_instruction[11:6];
+        parameter2 <= ID_instruction[5:0];
+    end
+
+end
+
+
+always @(*) begin
+    case (opcode)
+        4'b0000: begin
+            // Handle opcode 0
+        end
+        4'b0001: begin
+            // Handle opcode 1
+        end
+        4'b0010: begin
+            // Handle opcode 2
+        end
+        4'b0011: begin
+            // Handle opcode 3
+        end
+        4'b0100: begin
+            // Handle opcode 4
+        end
+        4'b0101: begin
+            // Handle opcode 5
+        end
+        4'b0110: begin
+            // Handle opcode 6
+        end
+        4'b0111: begin
+            // Handle opcode 7
+        end
+        4'b1000: begin
+            // Handle opcode 8
+        end
+        4'b1001: begin
+            // Handle opcode 9
+        end
+        4'b1010: begin
+            // Handle opcode 10
+        end
+        4'b1011: begin
+            // Handle opcode 11
+        end
+        4'b1100: begin
+            // Handle opcode 12
+        end
+        default: begin
+            opcode <= 4'b0;
+        end
+    endcase
+end
+
+endmodule
+

@@ -1,4 +1,4 @@
-module alu(
+module ALU(
     input latched_bus1_en,
     input latched_bus2_en,
     input ALU_clock,
@@ -21,8 +21,7 @@ always(posedge ALU_clock) begin
     if(ALU_reset) begin
         clk_count = 0;
         latched_bus1_in = 16'b0;
-        latched_bus2
-        _in = 16'b0;
+        latched_bus2_in = 16'b0;
     end else begin
         if (latched_bus1_en) begin
             latched_bus1_in = bus_in;

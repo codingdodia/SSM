@@ -1,9 +1,8 @@
 module ALU_FSM(
     input clock,
     input reset,
-    input FSM_start,
+    input [3:0]FSM_start,
     input [3:0] opcode,
-    input [3:0] start,
     input [5:0] param1,
     input [5:0] param2,
     output reg bus_register_input_en,
@@ -13,6 +12,8 @@ module ALU_FSM(
     output reg latched_bus2_en,
     output reg alu_bus_out_en,
     output reg [3:0] alu_control,
+    output reg I0_bus_input_en,
+    output reg I0_bus_output_en,
     output reg done
 );
 
@@ -40,7 +41,7 @@ end
 always@(*) begin
     case(current_state)
         s0: begin   
-            if(FSM_start) begin
+            if(FSM_start == 4'b0) begin
                 next_state = s1;
             end else begin
                 next_state = s0;
@@ -78,8 +79,13 @@ always@(posedge clock) begin
             end
 
             s1: begin
-                register_addr = param1;
-                bus_register_out_en = 1;
+                if (param1 > 4) begin
+                    I0_bus_output_en = 1;
+                end else begin
+                    // Load param1 into register
+                    register_addr = param1;
+                    bus_register_out_en = 1;
+                end
             end
 
             s2: begin
@@ -90,11 +96,17 @@ always@(posedge clock) begin
             s3: begin
                 latched_bus1_en = 0;
                 bus_register_out_en = 0;
+                I0_bus_ouput_en = 0;
             end
 
             s4: begin
-                register_addr = param2;
-                bus_register_out_en = 1;
+                if (param2 > 4) begin
+                    I0_bus_output_en = 1;
+                end else begin
+                    // Load param2 into register
+                    register_addr = param2;
+                    bus_register_out_en = 1;
+                end
             end
 
             s5: begin
@@ -104,6 +116,7 @@ always@(posedge clock) begin
             s6: begin
                 latched_bus2_en = 0;
                 bus_register_out_en = 0;
+                I0_bus_ouput_en = 0;
             end
 
             s7: begin
