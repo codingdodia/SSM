@@ -5,7 +5,11 @@ module Register(
     input [15:0] bus_register_input,
     input bus_register_input_en,
     output [15:0] bus_register_output,
-    input bus_register_out_en
+    input bus_register_out_en,
+    input register1_data,
+    input register2_data,
+    input register3_data,
+    input register4_data
 );
 
 reg [15:0] register_data [3:0];
@@ -22,10 +26,10 @@ always@(posedge register_clock) begin
 
     else if (bus_register_input_en) begin
         case (register_addr[5:0]) // Use only the lower 2 bits of the address
-            2'b00: register_data[0] <= bus_register_input;
-            2'b01: register_data[1] <= bus_register_input;
-            2'b10: register_data[2] <= bus_register_input;
-            2'b11: register_data[3] <= bus_register_input;
+            6'b000000: register_data[0] <= bus_register_input;
+            2'b000001: register_data[1] <= bus_register_input;
+            6'b000010: register_data[2] <= bus_register_input;
+            6'b000011: register_data[3] <= bus_register_input;
         endcase
     end
 
