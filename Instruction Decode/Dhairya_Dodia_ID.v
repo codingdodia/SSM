@@ -25,52 +25,5 @@ always@(posedge ID_clock) begin
 end
 
 
-always @(*) begin
-    case (opcode)
-        4'b0000: begin
-            // Handle opcode 0
-        end
-        4'b0001: begin
-            // Handle opcode 1
-        end
-        4'b0010: begin
-            // Handle opcode 2
-        end
-        4'b0011: begin
-            // Handle opcode 3
-        end
-        4'b0100: begin
-            // Handle opcode 4
-        end
-        4'b0101: begin
-            // Handle opcode 5
-        end
-        4'b0110: begin
-            // Handle opcode 6
-        end
-        4'b0111: begin
-            // Handle opcode 7
-        end
-        4'b1000: begin
-            // Handle opcode 8
-        end
-        4'b1001: begin
-            // Handle opcode 9
-        end
-        4'b1010: begin
-            // Handle opcode 10
-        end
-        4'b1011: begin
-            // Handle opcode 11
-        end
-        4'b1100: begin
-            // Handle opcode 12
-        end
-        default: begin
-            opcode <= 4'b0;
-        end
-    endcase
-end
-
 endmodule
 

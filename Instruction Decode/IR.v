@@ -3,10 +3,9 @@ module IR(
     input reset,
     input IR_in_en,
     input [15:0] instruction_in,
-    output [15:0] instruction_to_ID;
+    output reg [15:0] instruction_to_ID
 );
 
-    reg [15:0] instruction_to_ID;
 
     always @(posedge clock or posedge reset) begin
         if (reset) begin
