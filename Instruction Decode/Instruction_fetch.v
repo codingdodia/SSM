@@ -71,12 +71,11 @@ always@(*) begin
         s13: next_state = s14;
         s14:  begin
             if(DONE) begin
-                next_state = s15;
+                next_state = s0;
             end else begin
                 next_state = s14;
             end
         end
-        s15: next_state = s0;
         default: next_state = s0;
     endcase
 end   
@@ -90,6 +89,7 @@ always@(posedge clock) begin
         MDR_bus_data_out_en = 1'b0;
         FSM_start = 4'b0000;
         IR_in_en = 1'b0;
+        EN = 1'b0;
     end
 
     else begin
@@ -130,11 +130,12 @@ always@(posedge clock) begin
             end
 
             s7:begin
+                pc_increment_en = 1'b0;
                 // Wait for MFC
             end
 
             s8: begin
-                pc_increment_en = 1'b0;
+                
                 IR_in_en = 1'b1;
                 
             end
@@ -156,7 +157,6 @@ always@(posedge clock) begin
 
             s12: begin
 
-                FSM_start = 4'b1111;
                 case(opcode)
                     // ALU
                     4'b0001: FSM_start = 4'b0001;  // ADD
@@ -181,12 +181,15 @@ always@(posedge clock) begin
             end
 
             s13: begin
+
+                FSM_start = 4'b0000;
                 
             end
 
             s14: begin
                 // Wait for done
             end
+
             
         endcase
     end

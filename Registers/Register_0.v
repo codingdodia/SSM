@@ -24,4 +24,6 @@ tri_state_buffer reg0_tri_state(
     .data_in(register_data),
     .enable(bus_register0_out_en),
     .data_out(bus_register0_output)
-)
+);
+
+endmodule
