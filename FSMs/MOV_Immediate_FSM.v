@@ -1,7 +1,7 @@
 module MOV_FSM(
     input clock,
     input reset,
-    input FSM_start,
+    input [3:0] FSM_start,
     input [5:0] source,
     input [5:0] dest,
     output reg [5:0] register_addr,
@@ -64,7 +64,7 @@ always@(*) begin
 
     case(current_state)
         s0: begin   
-            if(FSM_start) begin
+            if(FSM_start === 4'b1000) begin
                 next_state = s1;
             end else begin
                 next_state = s0;

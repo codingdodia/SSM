@@ -66,7 +66,7 @@ always@(*) begin
 
     case(current_state)
         s0: begin   
-            if(FSM_start === 0011) begin
+            if(FSM_start === 0100) begin
                 next_state = s1;
             end else begin
                 next_state = s0;

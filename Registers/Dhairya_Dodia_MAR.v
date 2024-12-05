@@ -2,6 +2,7 @@ module MAR(
     input MAR_clock,
     input MAR_reset,
     input MAR_in_en,
+    input address_in_en,
     input [15:0] MAR_address_in,
     output reg [15:0] MAR_address_out
 );
@@ -16,8 +17,5 @@ always @(posedge MAR_clock) begin
     end
 end
 
-Memory inst(
-    .addr(address_out)
-);
 
 endmodule

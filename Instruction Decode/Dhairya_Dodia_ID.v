@@ -4,7 +4,7 @@ module ID(
     input [15:0] ID_instruction,
     output reg [3:0] opcode,
     output reg [5:0] parameter1,
-    output reg [5:0] parameter2
+    output reg [5:0] parameter2,
 );
 
 

@@ -42,7 +42,7 @@ end
 always@(*) begin
     case(current_state)
         s0: begin   
-            if(FSM_start == 4'b0000) begin
+            if(FSM_start == 4'b0010) begin
                 next_state = s1;
             end else begin
                 next_state = s0;

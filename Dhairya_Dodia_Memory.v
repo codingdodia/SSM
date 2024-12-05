@@ -33,7 +33,7 @@ begin
     end
 
     else memorycell = datain;
-        #5 MFC = 1;
+    #5 MFC = 1;
 end
 
 always@(negedge EN)
