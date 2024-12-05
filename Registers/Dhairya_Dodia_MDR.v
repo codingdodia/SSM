@@ -21,7 +21,7 @@ always @(posedge MDR_clock) begin
         MDR_data_going_in = MDR_bus_data_in;
     end else begin
         MDR_data_going_out = MDR_data_from_memory;
-        MDR_data_to_memory = MDR_data;
+        MDR_data_to_memory = MDR_data_going_out;
     end
 end
 
