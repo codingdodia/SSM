@@ -32,19 +32,30 @@ parameter s7 = 4'b0111;
 parameter s8 = 4'b1000;
 parameter s9 = 4'b1001;
 parameter s10 = 4'b1010;
+parameter s11 = 4'b1011;
+parameter s12 = 4'b1100;
+parameter s13 = 4'b1101;
 
 always @(posedge clock) begin
     if (reset) begin
-        current_state <= s0;
+        current_state = s0;
+        done = 1'b0;
+        bus_register_input_en = 1'bz;
+        bus_register_out_en = 1'bz;
+        latched_bus1_en = 1'bz;
+        latched_bus2_en = 1'bz;
+        alu_control = 4'bzzzz;
+        alu_bus_out_en = 1'bz;
+        immediate_en = 1'bz;
     end else begin
-        current_state <= next_state;
+        current_state = next_state;
     end
 end
 
 always@(*) begin
     case(current_state)
         s0: begin   
-            if(FSM_start) begin
+            if(FSM_start === 4'b0010) begin
                 next_state = s1;
             end else begin
                 next_state = s0;
@@ -59,7 +70,10 @@ always@(*) begin
         s7: next_state = s8;
         s8: next_state = s9;
         s9: next_state = s10;
-        s10: next_state = s0;
+        s10: next_state = s11;
+        s11: next_state = s12;
+        s12: next_state = s13;
+        s13: next_state = s0;
         default: next_state = s0;
     endcase
 end
@@ -67,87 +81,75 @@ end
 
 
 always@(posedge clock) begin
-
-    if (reset) begin
-        done <= 1'b0;
-        bus_register_input_en <= 1'b0;
-        bus_register_out_en <= 1'b0;
-        latched_bus1_en <= 1'b0;
-        latched_bus2_en <= 1'b0;
-        alu_bus_out_en <= 1'b0;
-        immediate_en <= 1'b0;
-    end 
     
-    else begin
-        case(current_state)
-            s0: begin 
-                done = 1'b0;
-                
-            end
+    case(current_state)
+        s0: begin 
+            done = 1'b0;
+            
+        end
 
-            s1: begin
-                register_addr = param1;
-                bus_register_out_en = 1'b1;;
-            end
+        s1: begin
+            register_addr = param1;
+            bus_register_out_en = 1'b1;
+        end
 
-            s2: begin
-                latched_bus1_en = 1'b1;
-                alu_control = opcode;
-            end
+        s2: begin
+            latched_bus1_en = 1'b1;
+            alu_control = opcode;
+        end
 
-            s3: begin
-                latched_bus1_en = 1'b0;
-                
-                immediate_extended = {10'b0, immediate};
-            end
+        s3: begin
+            latched_bus1_en = 1'b0;
+            immediate_extended = {10'b0, immediate};
+        end
 
-            s4: begin
-                bus_register_out_en = 1'b0;
-            end
+        s4: begin
+            bus_register_out_en = 1'b0;
+        end
 
-            s5: begin
-                immediate_en = 1'b1;
-            end
+        s5: begin
+            immediate_en = 1'b1;
+        end
 
-            s6: begin
-                latched_bus2_en = 1'b1;
-            end
+        s6: begin
+            latched_bus2_en = 1'b1;
+        end
 
-            s7: begin
-                latched_bus2_en = 1'b0;
-                immediate_en = 1'b0;
-            end
+        s7: begin
+            latched_bus2_en = 1'b0;
+        end
+        
 
-            s8: begin
-                immediate_en = 1'b0;
-            end
+        s8: begin
+            immediate_en = 1'b0;
+        end
 
-            s9: begin
-                alu_bus_out_en = 1'b1;
-                register_addr = param1;
-            end
+        s9: begin
+            alu_bus_out_en = 1'b1;
+            register_addr = param1;
+        end
 
-            s10: begin
-                bus_register_input_en = 1'b1;
-            end
+        s10: begin
+            bus_register_input_en = 1'b1;
+        end
 
-            s11: begin 
-                bus_register_input_en = 1'b0;
-                done = 1'b1;
-            end
+        s11: begin 
+            bus_register_input_en = 1'b0;
+        end
 
-            s12: begin
-                alu_bus_out_en = 1'b0;
-            end
+        s12: begin
+            alu_bus_out_en = 1'b0;
+            done = 1'b1;
+        end
 
-            s13: begin
-                done = 1'b0;
-            end
+        s13: begin
+            done = 1'b0;
+        end
 
-            default: next_state = s0;
+        default: next_state = s0;
 
-        endcase
-    end
+    endcase
+    
 end
 
 tri_state_buffer immediate_tri_state(
