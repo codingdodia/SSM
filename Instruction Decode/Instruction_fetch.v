@@ -2,36 +2,36 @@ module Instruction_fetch(
     input clock,
     input reset,
     input [3:0] opcode,
-    output reg R_W, EN, MFC,
+    output reg R_W, EN,
+    input MFC,
     output reg pc_out_en, pc_increment_en,
     output reg MAR_address_in_en,
-    output reg MDR_bus_data_in_en, MDR_bus_data_out_en,
+    output reg MDR_bus_data_out_en,
     input DONE,
     input START,
-    output IR_in_en,
-    output reg [3:0] FSM_start,
-
+    output reg IR_in_en,
+    output reg [3:0] FSM_start
 );
 
 
-parameter s0: 4'b0000;
-parameter s1: 4'b0001;
-parameter s2: 4'b0010;
-parameter s3: 4'b0011;
-parameter s4: 4'b0100;
-parameter s5: 4'b0101;
-parameter s6: 4'b0110;
-parameter s7: 4'b0111;
-parameter s8: 4'b1000;
-parameter s9: 4'b1001;
-parameter s10: 4'b1010;
-parameter s11: 4'b1011;
-parameter s12: 4'b1100;
-parameter s13: 4'b1101;
-parameter s14: 4'b1110;
-parameter s15: 4'b1111;
+parameter s0 = 4'b0000;
+parameter s1 = 4'b0001;
+parameter s2 = 4'b0010;
+parameter s3 = 4'b0011;
+parameter s4 = 4'b0100;
+parameter s5 = 4'b0101;
+parameter s6 = 4'b0110;
+parameter s7 = 4'b0111;
+parameter s8 = 4'b1000;
+parameter s9 = 4'b1001;
+parameter s10 = 4'b1010;
+parameter s11 = 4'b1011;
+parameter s12 = 4'b1100;
+parameter s13 = 4'b1101;
+parameter s14 = 4'b1110;
+parameter s15 = 4'b1111;
 
-
+reg [3:0] current_state, next_state;
 
 always@(posedge clock) begin
     if(reset) begin
@@ -57,7 +57,7 @@ always@(*) begin
         s5: next_state = s6;
         s6: next_state = s7;
         s7: begin
-            if(!MFC) begin
+            if(MFC) begin
                 next_state = s8;
             end else begin
                 next_state = s7;
@@ -66,16 +66,16 @@ always@(*) begin
         s8: next_state = s9;
         s9: next_state = s10;
         s10: next_state = s11;
-        s11: begin
-            if(DONE) begin
-                next_state = s12;
-            end else begin
-                next_state = s11;
-            end
-        end
+        s11: next_state = s12;
         s12: next_state = s13;
         s13: next_state = s14;
-        s14: next_state = s15;
+        s14:  begin
+            if(DONE) begin
+                next_state = s15;
+            end else begin
+                next_state = s14;
+            end
+        end
         s15: next_state = s0;
         default: next_state = s0;
     endcase
@@ -86,10 +86,10 @@ always@(posedge clock) begin
     if(reset) begin
         pc_out_en = 1'b0;
         pc_increment_en = 1'b0;
-        address_in_en = 1'b0;
-        MDR_bus_data_in_en = 1'b0;
+        MAR_address_in_en = 1'b0;
         MDR_bus_data_out_en = 1'b0;
         FSM_start = 4'b0000;
+        IR_in_en = 1'b0;
     end
 
     else begin
@@ -109,12 +109,13 @@ always@(posedge clock) begin
             end
 
             s3: begin
-                EN = 1'b1;
+                R_W = 1'b1;
+                
                 
             end
 
             s4: begin
-                R_W = 1'b1;
+                EN = 1'b1;
                 MAR_address_in_en = 1'b0;
             end
             
@@ -124,7 +125,7 @@ always@(posedge clock) begin
             end
 
             s6: begin
-                pc_increment = 1'b1;
+                pc_increment_en = 1'b1;
                 MDR_bus_data_out_en = 1'b1;
             end
 
@@ -133,19 +134,19 @@ always@(posedge clock) begin
             end
 
             s8: begin
-                pc_increment = 1'b0;
+                pc_increment_en = 1'b0;
                 IR_in_en = 1'b1;
                 
             end
 
             s9: begin
                 
-
+                // Wait for decode
             end
 
             s10: begin
                 IR_in_en = 1'b0;
-                // Wait for decode
+                
             end
 
             s11: begin
@@ -154,6 +155,8 @@ always@(posedge clock) begin
             end
 
             s12: begin
+
+                FSM_start = 4'b1111;
                 case(opcode)
                     // ALU
                     4'b0001: FSM_start = 4'b0001;  // ADD
@@ -173,6 +176,7 @@ always@(posedge clock) begin
 
                     4'b1100: FSM_start = 4'b1001; // Store
                     4'b1101: FSM_start = 4'b1010; // Jump
+                    default: FSM_start = 4'b1111;
                 endcase
             end
 
