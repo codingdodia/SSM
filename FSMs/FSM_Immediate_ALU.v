@@ -4,7 +4,7 @@ module ALU_Immediate(
     input FSM_start,
     input [3:0] opcode,
     input [5:0] param1,
-    input [15:0] immediate,
+    input [5:0] immediate,
     output [15:0] FSM_bus_output,
     output reg bus_register_input_en,
     output reg bus_register_out_en,
@@ -16,7 +16,10 @@ module ALU_Immediate(
     output reg done
 );
 
-reg immediate_en, current_state, next_state;
+reg [3:0] current_state, next_state;
+reg immediate_en;
+reg [15:0] immediate_extended;
+
 
 parameter s0 = 4'b0000;
 parameter s1 = 4'b0001;
@@ -61,11 +64,7 @@ always@(*) begin
     endcase
 end
 
-tri_state_buffer immediate_tri_state(
-    .data_in(immediate),
-    .enable(immediate_en),
-    .data_out(FSM_bus_output)
-);
+
 
 always@(posedge clock) begin
 
@@ -88,49 +87,61 @@ always@(posedge clock) begin
 
             s1: begin
                 register_addr = param1;
-                bus_register_out_en = 1;
+                bus_register_out_en = 1'b1;;
             end
 
             s2: begin
-                latched_bus1_en = 1;
+                latched_bus1_en = 1'b1;
                 alu_control = opcode;
             end
 
             s3: begin
-                latched_bus1_en = 0;
-                bus_register_out_en = 0;
+                latched_bus1_en = 1'b0;
+                
+                immediate_extended = {10'b0, immediate};
             end
 
             s4: begin
-                immediate_en = 1;
+                bus_register_out_en = 1'b0;
             end
 
             s5: begin
-                latched_bus2_en = 1;
+                immediate_en = 1'b1;
             end
 
             s6: begin
-                latched_bus2_en = 0;
-                bus_register_out_en = 0;
+                latched_bus2_en = 1'b1;
             end
 
             s7: begin
-                alu_bus_out_en = 1;
-                register_addr = param1;
+                latched_bus2_en = 1'b0;
+                immediate_en = 1'b0;
             end
 
             s8: begin
-                bus_register_input_en = 1;
+                immediate_en = 1'b0;
             end
 
-            s9: begin 
-                bus_register_input_en = 0;
-                alu_bus_out_en = 0;
-                done = 1;
+            s9: begin
+                alu_bus_out_en = 1'b1;
+                register_addr = param1;
             end
 
             s10: begin
-                done = 0;
+                bus_register_input_en = 1'b1;
+            end
+
+            s11: begin 
+                bus_register_input_en = 1'b0;
+                done = 1'b1;
+            end
+
+            s12: begin
+                alu_bus_out_en = 1'b0;
+            end
+
+            s13: begin
+                done = 1'b0;
             end
 
             default: next_state = s0;
@@ -138,5 +149,11 @@ always@(posedge clock) begin
         endcase
     end
 end
+
+tri_state_buffer immediate_tri_state(
+    .data_in(immediate_extended),
+    .enable(immediate_en),
+    .data_out(FSM_bus_output)
+);
 
 endmodule
