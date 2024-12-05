@@ -1,7 +1,6 @@
 module IO_One(
     input I1_clock,
     input I1_reset,
-    input external_I1_input_en,
     input [15:0] external_I1_input,
     input bus_I1_output_en,
     output [15:0] bus_I1_output
@@ -16,7 +15,7 @@ always@(posedge I1_clock) begin
         I1_data <= 16'b0;
     end
 
-    else if(external_I1_input_en) begin
+    else begin
         I1_data <= external_I1_input;
     end
 
